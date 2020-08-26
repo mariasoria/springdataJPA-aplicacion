@@ -43,11 +43,55 @@ public class JpaDemoApplication implements CommandLineRunner {
 	// este metodo nos permite ver mensajes y ejecutar métodos "extra" en la command line
 	@Override
 	public void run(String... args) throws Exception {
-		buscarUsuario();
+		buscarVacantesVariosEstatus();
 	}
 
+
+	// METODOS CON QUERY METHODS
+
+	// Query Method: Buscar vacantes por estatus
+	private void buscarVacantesPorEstatus (){
+		List <Vacante> listVacantes = repoVacantes.findByEstatus("Aprobada");
+		System.out.println("Total de registros encontrados: " + listVacantes.size());
+		for (Vacante vac : listVacantes){
+			System.out.println(vac.getId() + " - " + vac.getNombre() + " - " + vac.getEstatus());
+		}
+	}
+
+
+	// Query Method: Buscar vacantes por Destacado y Estatus Ordenado por Id de forma descendente
+	private void findByDestacadoAndEstatus(){
+		List<Vacante> listVacantes = repoVacantes.findByDestacadoAndEstatusOrderByIdDesc(0, "Aprobada");
+		System.out.println("Total de registros encontrados: " + listVacantes.size());
+		for (Vacante vacante : listVacantes){
+			System.out.println(vacante.getId() + " - " + vacante.getNombre() + " - " + vacante.getEstatus() + " - " + vacante.getDestacado());
+		}
+	}
+
+	// Query Method: Buscar vacantes por un rango de salarios
+	private void buscarVacantesSalario(){
+		List<Vacante> listVacantes = repoVacantes.findBySalarioBetweenOrderBySalarioDesc(7000, 14000);
+		System.out.println("Total de registros encontrados: " + listVacantes.size());
+		for (Vacante vacante : listVacantes){
+			System.out.println(vacante.getId() + " - " + vacante.getNombre() + " - " + vacante.getSalario() + "€.");
+		}
+	}
+
+
+	// Buscamos las vacantes por varios estatus con IN
+	private void buscarVacantesVariosEstatus(){
+		String[] estatus = new String[]{"Eliminada", "Aprobada"};
+		List <Vacante> vacante = repoVacantes.findByEstatusIn(estatus);
+		System.out.println("Total de registros encontrados: " + vacante.size());
+		for (Vacante v : vacante){
+			System.out.println(v.getId() + " - " + v.getNombre() + " : " + v.getEstatus());
+		}
+	}
+
+
+
 	/*
-	* Método para buscar un usuario y desplegar sus perfiles asociados
+	* Query Method: buscar un usuario y desplegar sus perfiles asociados
 	* */
 	public void buscarUsuario(){
 		Optional <Usuario> opcional = repoUsuarios.findById(1);
@@ -64,6 +108,7 @@ public class JpaDemoApplication implements CommandLineRunner {
 	}
 
 
+	// METODOS CON REPOUSUARIOS
 	/*
 	 * Crear un usuario con dos perfiles "ADMINISTRADOR" y "USUARIO"
 	 * */
@@ -89,6 +134,8 @@ public class JpaDemoApplication implements CommandLineRunner {
 		repoUsuarios.save(usuario);
 	}
 
+
+	// METODOS CON REPOPERFILES
 	/*
 	* Método que regresa una lista de objetos de tipo Perfil que representa los diferentes
 	* PERFILES o ROLES que tendremos en nuestra aplicación de Empleos
@@ -111,8 +158,6 @@ public class JpaDemoApplication implements CommandLineRunner {
 		return lista;
 	}
 
-
-	// METODOS CON REPOPERFILES
 
 	// Este metodo inserta en la BD los perfiles establecidos
 	private void crearPerfilesAplicacion(){
